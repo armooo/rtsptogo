@@ -45,6 +45,36 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
         self.headers = mimetools.Message(self.rfile, False)
         print 'headers done'
 
+    def parse_transport_header(self):
+        transportheader = self.headers.get('Transport')
+        transports = []
+        options = transportheader.split(',')
+        for option in options:
+            transport = {}
+            parameters = option.split(';')
+            transport['transport-spec'] = parameters[0]
+            for parameter in parameters[1:]:
+                values = parameter.split('=')
+                if len(values) == 1:
+                    transport[values[0]] = True
+                else:
+                    transport[values[0]] = values[1]
+            transports.append(transport)
+        return transports
+
+    def build_transport_header(self, transport):
+        transportheader = []
+        transportheader.append(transport['transport-spec'])
+        for k, v in transport.items():
+            if k in ('transport-spec'):
+                continue
+            if v == True:
+                transportheader.append(k)
+            else:
+                transportheader.append('%s=%s' % (k, v))
+        transportheader.append('server_port=10%s' % random.randint(100, 999))
+        return ';'.join(transportheader)
+
     def handle_one_request(self):
         if not self.parse_request():
             return
@@ -103,20 +133,7 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
         session = self.get_session()
         print session
 
-        transportheader = self.headers.get('Transport')
-        transports = []
-        options = transportheader.split(',')
-        for option in options:
-            transport = {}
-            parameters = option.split(';')
-            transport['transport-spec'] = parameters[0]
-            for parameter in parameters[1:]:
-                values = parameter.split('=')
-                if len(values) == 1:
-                    transport[values[0]] = True
-                else:
-                    transport[values[0]] = values[1]
-            transports.append(transport)
+        transports = self.parse_transport_header()
 
         for transport in transports:
             if transport['transport-spec'] not in ('RTP/AVP', 'RTP/AVP/UDP'):
@@ -129,17 +146,7 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
         else:
             raise Exception('Can not find a transport I like')
 
-        transportheader = []
-        transportheader.append(transport['transport-spec'])
-        for k, v in transport.items():
-            if k in ('transport-spec'):
-                continue
-            if v == True:
-                transportheader.append(k)
-            else:
-                transportheader.append('%s=%s' % (k, v))
-        transportheader.append('server_port=10%s' % random.randint(100, 999))
-        transportheader = ';'.join(transportheader)
+        transportheader = self.build_transport_header(transport)
 
         if self.url.endswith('audio'):
             session['audio_port'] = transport['client_port']
