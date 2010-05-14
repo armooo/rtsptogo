@@ -262,7 +262,13 @@ class BackGroundCopy(threading.Thread):
             buf = self.in_.read(16*1024)
             if not buf:
                 break
-            self.out.write(buf)
+            try:
+                self.out.write(buf)
+            except IOError, e:
+                if e.errno == 32 and self.die:
+                    break
+                else:
+                    raise
 
 if __name__ == '__main__':
     HOST, PORT = "", 9999
