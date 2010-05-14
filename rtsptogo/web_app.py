@@ -5,10 +5,8 @@ import sys
 import os.path
 
 import web
-import tivoapi
-
-MAC = ''
-TIVOS = ['192.168.100.217', '192.168.100.231']
+import rtsptogo.tivoapi as tivoapi
+from rtsptogo.config import config
 
 urls = (
     r'/', 'Index',
@@ -19,14 +17,14 @@ render = web.template.render(os.path.join(os.path.dirname(__file__), 'templates'
 
 class Tivo:
     def GET(self, tivo_address, path):
-        if not tivo_address in TIVOS:
+        if not tivo_address in config.get('main', 'tivos').split(','):
             raise Exception('Bad tivo address')
         if not path:
             path = '/'
         else:
             path = '/' + path
 
-        tivo = tivoapi.Server(tivo_address, MAC)
+        tivo = tivoapi.Server(tivo_address, config.get('main', 'mak'))
         items = tivo.get_container(path)
 
         def patch_item(item):
@@ -40,7 +38,9 @@ class Tivo:
             elif item['type'] == 'video':
                 hostname = web.ctx.env['HTTP_HOST'].split(':')[0]
                 url = urlparse.urlparse(item['url'])
-                item['url'] = 'rtsp://%s:9999/%s%s?%s' % (hostname, tivo_address, url.path, url.query)
+                rtsp_port = config.get('main', 'rtsp_port')
+                item['url'] = 'rtsp://%s:%s/%s%s?%s' % (hostname, rtsp_port, tivo_address,
+                    url.path, url.query)
             return item
 
         items = [patch_item(item) for item in items]
@@ -54,7 +54,7 @@ class Tivo:
 class Index:
     def GET(self):
         items = []
-        for address in TIVOS:
+        for address in config.get('main', 'tivos').split(','):
             item = {}
             items.append(item)
             item['type'] = 'tivo'

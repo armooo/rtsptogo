@@ -2,7 +2,7 @@
     Classes to represent a way to rtp stream.
 
     The public api is
-    
+
     __init__(session, options)
         session is a dict with the clients options
         {
@@ -41,7 +41,9 @@
         #but now don't want to deal with the chance of deadlock
 """
 
-import subprocess  
+import subprocess
+
+from rtsptogo.config import config
 
 class FFMPEG:
     def __init__(self, session, options):
@@ -107,7 +109,8 @@ def get_rtp():
     return FFMPEG
 
 def get_tivodecode():
-        tivodecode_command = 'tivodecode -'.split()
+        mak = config.get('main', 'mak')
+        tivodecode_command = ('tivodecode -m %s -' % mak).split()
         tivodecode = subprocess.Popen(tivodecode_command, stdout=subprocess.PIPE,
             stdin=subprocess.PIPE)
         return tivodecode

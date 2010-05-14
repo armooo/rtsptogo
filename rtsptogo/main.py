@@ -5,6 +5,7 @@ from threading import Thread
 from wsgiref.simple_server import make_server, WSGIServer
 from SocketServer import ThreadingMixIn
 
+import rtsptogo.config
 from rtsptogo.web_app import app
 from rtsptogo.rtspd import RSTPServer, RSTPHandler
 
@@ -43,8 +44,11 @@ def usage():
     pass
 
 def main(argv):
-    start_rtspd('', 9999)
-    start_httpd('', 8080)
+    rtsptogo.config.load_config()
+    config = rtsptogo.config.config
+    bind_address = config.get('main', 'bind_address')
+    start_rtspd(bind_address, int(config.get('main', 'rtsp_port')))
+    start_httpd(bind_address, int(config.get('main', 'http_port')))
     signal.signal(signal.SIGTERM, handler)
 
 if __name__ == '__main__':

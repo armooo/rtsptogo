@@ -5,13 +5,11 @@ import random
 import urlparse
 import threading
 
-from rtsptogo.rtp import get_rtp
 import rtsptogo.tivoapi as tivoapi
-
-TIVO_MAC = ''
+from rtsptogo.rtp import get_rtp
+from rtsptogo.config import config
 
 class RSTPHandler(SocketServer.StreamRequestHandler):
-
 
     def parse_request(self):
         if not self.parse_request_line():
@@ -189,7 +187,7 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
         url = urlparse.urlparse(self.url)
         host, path = url.path[1:].split('/', 1)
         path = path + '?' + url.query
-        server = tivoapi.Server(host, TIVO_MAC)
+        server = tivoapi.Server(host, config.get('main', 'mak'))
         return server.get_video(path)
 
 class RSTPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
