@@ -6,6 +6,7 @@ from wsgiref.simple_server import make_server, WSGIServer
 from SocketServer import ThreadingMixIn
 
 import rtsptogo.config
+import rtsptogo.discover as discover
 from rtsptogo.web_app import app
 from rtsptogo.rtspd import RSTPServer, RSTPHandler
 
@@ -28,6 +29,10 @@ def start_httpd(host, port):
     th.start()
     print 'Started httpd %s' % port
 
+def start_discover(host):
+    discover.start(host)
+    print 'Started discover'
+
 def handler(signum, frame):
     stop()
 
@@ -39,6 +44,8 @@ def stop():
     if httpd_server:
         print 'Shutdown httpd'
         httpd_server.shutdown()
+    print 'Shutdown discover'
+    discover.stop()
     print 'Shutting main thread'
     sys.exit()
 
@@ -46,12 +53,13 @@ def usage():
     pass
 
 def main():
+    signal.signal(signal.SIGTERM, handler)
     rtsptogo.config.load_config()
     config = rtsptogo.config.config
     bind_address = config.get('main', 'bind_address')
     start_rtspd(bind_address, int(config.get('main', 'rtsp_port')))
     start_httpd(bind_address, int(config.get('main', 'http_port')))
-    signal.signal(signal.SIGTERM, handler)
+    start_discover(bind_address)
 
     while True:
         try:

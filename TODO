@@ -1,5 +1,4 @@
-Auto find tivos with zeroconf
-HMAK or other auth for rtsp links
+HMAC or other auth for rtsp links
 Comand line processing
 Logging
 Auth lets not let anyone see our tivos

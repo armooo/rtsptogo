@@ -1,0 +1,10 @@
+$def with (items)
+<html>
+    <body>
+        <ul>
+        $items.sort(key=lambda x:x.get('title'))
+        $for item in items:
+            <li><a href="$item['url']">$item['title']</a></li>
+        </ul>
+    </body>
+</html>

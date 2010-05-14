@@ -5,8 +5,6 @@ $def with (items)
         $for item in items:
             $if item['type'] == 'container':
                 <li><a href="$item['url']">$item['title'] ($item['total_items'] items)</a></li>
-            $elif item['type'] == 'tivo':
-                <li><a href="$item['url']">$item['title']</a></li>
             $elif item['type'] == 'video':
                 <li><a href="$item['url']">$item['title'] - $item['episode_title']</a></li>
         </ul>

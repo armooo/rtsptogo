@@ -15,5 +15,6 @@ the medibuntu lucid package), and tivodecode. I have been using python2.6
 older may work.
 
 Put a config file in /etc/rtsptogo.conf, /usr/local/etcrtsptogo.conf or
-~/.rtsptogo.conf then "python -m rtsptogo.main" to start it up.
+~/.rtsptogo.conf then "python -m rtsptogo.main" or rtsptogo if you installed
+with pip to start it up.
 

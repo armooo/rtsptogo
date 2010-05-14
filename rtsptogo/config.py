@@ -16,7 +16,7 @@ def load_config(config_files=None):
         'http_port' : '8081',
         'rtsp_port' : '9998',
     }
-    requireds = ['mak', 'tivos']
+    requireds = ['mak']
 
     for default, value in defaults.items():
         if not config.has_option('main', default):
