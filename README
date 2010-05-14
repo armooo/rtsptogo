@@ -1,0 +1,19 @@
+rtsptogo is a rtsp server for tivos.
+
+It has an html interface listing tivos and the contents. It then links to
+an rtsp stream of each file.
+
+I have has success streaming SD content from a HD tivo to a nexus one, G1,
+vlc and totem over a lan. Real time transfers spead is needed from your
+tivo to computer and a real time transcode.
+
+All the data is also available in json by making the same get requests with a
+Accept: application/json header.
+
+A newish web.py is needed, ffmpeg with libx264 and libfaac support (I am using
+the medibuntu lucid package), and tivodecode. I have been using python2.6
+older may work.
+
+Put a config file in /etc/rtsptogo.conf, /usr/local/etcrtsptogo.conf or
+~/.rtsptogo.conf then "python -m rtsptogo.main" to start it up.
+
