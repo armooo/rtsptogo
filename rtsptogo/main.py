@@ -17,6 +17,7 @@ def start_rtspd(host, port):
     rtspd_server = RSTPServer((host, port), RSTPHandler)
     th = Thread(target=rtspd_server.serve_forever)
     th.start()
+    print 'Started rtspd %s' % port
 
 def start_httpd(host, port):
     global httpd_server
@@ -25,6 +26,7 @@ def start_httpd(host, port):
     httpd_server = make_server(host, port, app, server_class=ThreaddedWSGIServer)
     th = Thread(target=httpd_server.serve_forever)
     th.start()
+    print 'Started httpd %s' % port
 
 def handler(signum, frame):
     stop()
@@ -43,7 +45,7 @@ def stop():
 def usage():
     pass
 
-def main(argv):
+def main():
     rtsptogo.config.load_config()
     config = rtsptogo.config.config
     bind_address = config.get('main', 'bind_address')
@@ -51,8 +53,6 @@ def main(argv):
     start_httpd(bind_address, int(config.get('main', 'http_port')))
     signal.signal(signal.SIGTERM, handler)
 
-if __name__ == '__main__':
-    main(sys.argv)
     while True:
         try:
             time.sleep(1000)
@@ -61,3 +61,5 @@ if __name__ == '__main__':
         except:
             pass
 
+if __name__ == '__main__':
+    main()
