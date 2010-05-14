@@ -24,7 +24,7 @@ class Tivo:
         else:
             path = '/' + path
 
-        tivo = tivoapi.Server(tivo_address, config.get('main', 'mak'))
+        tivo = tivoapi.get_server(tivo_address, config.get('main', 'mak'))
         items = tivo.get_container(path)
 
         def patch_item(item):

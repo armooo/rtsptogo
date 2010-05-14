@@ -12,11 +12,11 @@ class Server:
     TYPE_CONTAINER = 'x-tivo-container/'
     cache = {}
 
-    def __init__(self, address, mac):
+    def __init__(self, address, mak):
         self.address = address
 
         pass_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-        pass_mgr.add_password('TiVo DVR', address, 'tivo', mac)
+        pass_mgr.add_password('TiVo DVR', address, 'tivo', mak)
         authhandler = urllib2.HTTPDigestAuthHandler(pass_mgr)
         cj = cookielib.CookieJar()
         cookiehandler = urllib2.HTTPCookieProcessor(cj)
@@ -79,3 +79,14 @@ class Server:
         url.append(urllib.urlencode(kargs))
 
         return ElementTree.fromstring(self.opener.open(''.join(url)).read())
+
+_servers = {}
+
+def get_server(address, mak):
+    try:
+        return _servers[(address, mak)]
+    except KeyError:
+        server = Server(address, mak)
+        _servers[(address, mak)] = server
+        return server
+

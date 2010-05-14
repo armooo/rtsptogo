@@ -187,7 +187,7 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
         url = urlparse.urlparse(self.url)
         host, path = url.path[1:].split('/', 1)
         path = path + '?' + url.query
-        server = tivoapi.Server(host, config.get('main', 'mak'))
+        server = tivoapi.get_server(host, config.get('main', 'mak'))
         return server.get_video(path)
 
 class RSTPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
