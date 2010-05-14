@@ -124,6 +124,10 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
         self.send_body('')
 
     def do_DESCRIBE(self):
+        if self.url.endswith('/audio') or self.url.endswith('/video'):
+            self.send_error(459, 'Only Aggregate Operation Allowed')
+            return
+
         self.send_response('200', 'OK')
         self.send_header('Content-Type', 'application/sdp')
         sdp = get_rtp().get_sdp({})
@@ -132,6 +136,10 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
     def do_SETUP(self):
         session = self.get_session()
         print session
+
+        if not (self.url.endswith('/audio') or self.url.endswith('/video')):
+            self.send_error(459, 'Aggregate Operation Not Allowed')
+            return
 
         transports = self.parse_transport_header()
 
@@ -144,13 +152,14 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
                 continue
             break
         else:
-            raise Exception('Can not find a transport I like')
+            self.send_error(461, 'Unsupported Transport')
+            return
 
         transportheader = self.build_transport_header(transport)
 
-        if self.url.endswith('audio'):
+        if self.url.endswith('/audio'):
             session['audio_port'] = transport['client_port']
-        elif self.url.endswith('video'):
+        elif self.url.endswith('/video'):
             session['video_port'] = transport['client_port']
 
         self.send_response('200', 'OK')
@@ -164,8 +173,13 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
     def do_PLAY(self):
         session = self.get_session()
 
+        if self.url.endswith('/audio') or self.url.endswith('/video'):
+            self.send_error(459, 'Only Aggregate Operation Allowed')
+            return
+
         if session.get('playing', False):
             self.send_error('455', 'Method Not Valid in This State')
+            return
 
         session['client_address'] = self.client_address[0]
 
