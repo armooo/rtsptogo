@@ -4,6 +4,7 @@ import uuid
 import random
 import urlparse
 import threading
+import urllib2
 
 import rtsptogo.tivoapi as tivoapi
 from rtsptogo.rtp import get_rtp
@@ -192,7 +193,14 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
 
         session['client_address'] = self.client_address[0]
 
-        video_file = self.get_video()
+        try:
+            video_file = self.get_video()
+        except urllib2.HTTPError, e:
+            if e.code == 503:
+                self.send_error(453, 'Not Enough Bandwidth')
+                return
+            raise
+
         rtp_out = get_rtp()(session, {})
         rtp_out.start()
         bg_copy = BackGroundCopy(video_file, rtp_out)
