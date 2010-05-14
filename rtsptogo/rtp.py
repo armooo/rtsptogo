@@ -80,7 +80,7 @@ class FFMPEG:
     def start(self):
         self.tivodecode = get_tivodecode()
         self.session['processes'].append(self.tivodecode)
-        
+
         ffmpeg_command = self.build_command()
         ffmpeg = subprocess.Popen(ffmpeg_command, stdin=self.tivodecode.stdout)
         self.session['processes'].append(ffmpeg)

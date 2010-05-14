@@ -40,7 +40,7 @@ class Server:
     def get_video(self, path):
         url = 'http://%s/%s' % (self.address, path)
         print '!'*5, url
-        return self.opener.open(url) 
+        return self.opener.open(url)
 
     def _convert_item(self, xml):
         item = {}
