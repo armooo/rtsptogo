@@ -9,6 +9,9 @@ import rtsptogo.tivoapi as tivoapi
 from rtsptogo.rtp import get_rtp
 from rtsptogo.config import config
 
+class ConnectionClosedError(Exception):
+    pass
+
 class RSTPHandler(SocketServer.StreamRequestHandler):
 
     def parse_request(self):
@@ -20,6 +23,9 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
     def parse_request_line(self):
         requestline = self.rfile.readline()
         print requestline
+
+        if requestline == '':
+            raise ConnectionClosedError()
 
         if requestline[-2:] == '\r\n':
             requestline = requestline[:-2]
@@ -91,7 +97,10 @@ class RSTPHandler(SocketServer.StreamRequestHandler):
 
     def handle(self):
         while True:
-            self.handle_one_request()
+            try:
+                self.handle_one_request()
+            except ConnectionClosedError:
+                break
 
     def send_error(self, code, message):
         print 'error: %s %s' % (code, message)

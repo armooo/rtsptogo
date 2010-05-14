@@ -6,7 +6,6 @@ Auth lets not let anyone see our tivos
 Make a video options module to guess a correct video size (User-Agent) add pram to rtsp link? At least keep the aspect ratio
 Update the FFMpeg class to use the options
 Stop using a hardcoded SPD and get it from ffmpeg some how
-Close the rtsp connection without error when the client hangsup
 Pipe closed errors (change order in the processes list?)
 CSS (based on User-Agent? some regex matching system?)
 Do everything the RTSP rfc says we should
